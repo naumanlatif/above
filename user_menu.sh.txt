@@ -1,0 +1,47 @@
+#!/bin/sh
+
+echo "Please select an option from the following:
+1. Change Password
+2. See the disk space
+3. Login to other box using ssh
+4. Show all service running
+5. Show all ports opened
+6. Show all Java apps running
+7. Facility to kill an app
+8. Exit"
+read NUM
+function kill_process() {
+        echo "Please provide the PID (Process ID) of the app or process to be killed:";
+        read PID;
+        kill $PID;
+        # To test if kill command executed without error or not
+        if [ $? -eq 0 ]; then
+                echo "App process killed successfully"
+        else
+                echo "Process not responding to kill. Would you like force kill the process: yes/no"
+                read USR_INPUT_7B;
+                if [ "$USR_INPUT_7B" == "yes" ]; then
+                        kill -9 $PID;
+                        if [ $? != 0 ]; then
+                                echo "Process not killed. Please contact system administrator"
+                                exit;
+                        else
+                                echo "Process successfully killed"
+                        fi
+                else
+                        echo "Existing without force kill of process";
+                        exit;
+                fi
+        fi
+}
+case $NUM in
+        1) passwd ;;
+        2) echo "Below are the file systems mounted and their disk usage information"; df -h ;;
+        3) echo "Please provide the servername of IP address of the server, you want to login to"; read SERVER; ssh $SERVER ;;
+        4) echo "Below are the services running:"; /sbin/service --status-all ;;
+        5) echo "Below are the ports opened:"; /bin/netstat -tulpn ;;
+        6) echo "Below are the Java apps running:"; ps -ef | grep java ;;
+        7) kill_process ;;
+        8) exit ;;
+        *) echo "INVALID OPTION!" ;;
+esac
